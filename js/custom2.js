@@ -25,12 +25,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Fetch data.json for each scenario
       fetch(scenarioPath)
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
           .then(data => {
+              console.log(`Loading scenario ${scenarioFolderName}`);
               // Dynamically create portfolio item HTML
               const portfolioItemHTML = `
                   <div class="item web branding col-sm-6 col-md-6 col-lg-4 isotope-mb-2">
-                    <a href="#scenario-${scenarioFolderName}" class="portfolio-item" onclick="showScenario('scenario-${scenarioFolderName}')">
+                   <a href="#scenario-${scenarioFolderName}" class="portfolio-item" onclick="showScenario('scenario-${scenarioFolderName}')">
                       <div class="overlay">
                         <span class="wrap-icon icon-link2"></span>
                         <div class="portfolio-item-content">
@@ -38,12 +44,12 @@ document.addEventListener('DOMContentLoaded', function() {
                           <p>${data.subtitle}</p>
                         </div>
                       </div>
-                      <img src="${scenarioFolderPath}${scenarioFolderName}/image.jpg" class="lazyload img-fluid" alt="${data.title}" onload="imageLoaded(${scenarioFolderName})">
+                      <img src="${scenarioFolderPath}${scenarioFolderName}/image.jpg" class="lazyload img-fluid" alt="${data.title}" onload="imageLoaded('${scenarioFolderName}')">
                     </a>
                   </div>
               `;
               scenarioContainer.innerHTML += portfolioItemHTML;
-
+              console.log(`Adding scenario detail for ${scenarioFolderName}`);
               // Dynamically create detailed scenario section HTML
               const scenarioDetailHTML = `
                   <div class="row mb-5 scenario-detail" id="scenario-${scenarioFolderName}">
