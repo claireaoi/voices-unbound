@@ -6,18 +6,18 @@ document.addEventListener('DOMContentLoaded', function() {
   // Fetch the list of scenario folders (subfolders)
   fetch(`${scenarioFolderPath}scenarios.json`)
     .then(response => response.json())
-    .then(scenarioFolders => {
-      scenarioFolders.forEach(folder => {
-        loadScenario(folder);
+    .then(data => {
+      const scenarioFolders = data.scenarios; // Access the "scenarios" array
+      scenarioFolders.forEach(subfolder => {
+        loadScenario(subfolder); // Load each scenario
       });
     })
     .catch(error => console.error('Failed to load scenario folders:', error));
 
-
   // Loop through all scenario folders
-  for (let i = 1; i <= scenarioCount; i++) {
-      loadScenario(i);
-  }
+  //for (let i = 1; i <= scenarioCount; i++) {
+    //   loadScenario(i);
+    //}
 
   // Function to load a scenario's data.json and dynamically create HTML
   function loadScenario(scenarioFolderName) {
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
               // Dynamically create portfolio item HTML
               const portfolioItemHTML = `
                   <div class="item web branding col-sm-6 col-md-6 col-lg-4 isotope-mb-2">
-                    <a href="#scenario-${scenarioFolderName}" class="portfolio-item" onclick="showScenario('scenario-${scenarioId}')">
+                    <a href="#scenario-${scenarioFolderName}" class="portfolio-item" onclick="showScenario('scenario-${scenarioFolderName}')">
                       <div class="overlay">
                         <span class="wrap-icon icon-link2"></span>
                         <div class="portfolio-item-content">
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
                           <p>${data.subtitle}</p>
                         </div>
                       </div>
-                      <img src="${scenarioFolderPath}${scenarioFolderName}/image.jpg" class="lazyload img-fluid" alt="${data.title}" onload="imageLoaded(${scenarioId})">
+                      <img src="${scenarioFolderPath}${scenarioFolderName}/image.jpg" class="lazyload img-fluid" alt="${data.title}" onload="imageLoaded(${scenarioFolderName})">
                     </a>
                   </div>
               `;
@@ -46,9 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
               // Dynamically create detailed scenario section HTML
               const scenarioDetailHTML = `
-                  <div class="row mb-5 scenario-detail" id="scenario-${scenarioId}">
+                  <div class="row mb-5 scenario-detail" id="scenario-${scenarioFolderName}">
                     <div class="col-md-4">
-                      <img src="${scenarioFolderPath}${scenarioId}/image.jpg" alt="${data.title}" class="img-fluid">
+                      <img src="${scenarioFolderPath}${scenarioFolderName}/image.jpg" alt="${data.title}" class="img-fluid">
                     </div>
                     <div class="col-md-8">
                       <div class="row">
@@ -72,22 +72,21 @@ document.addEventListener('DOMContentLoaded', function() {
               `;
               scenarioDetailsContainer.innerHTML += scenarioDetailHTML;
           })
-          .catch(error => console.error(`Failed to load scenario ${scenarioId}:`, error));
+          .catch(error => console.error(`Failed to load scenario ${scenarioFolderName}:`, error));
+
+  }
 
     // Function to refresh Isotope layout after loading new items
-  function refreshIsotope() {
-    const $container = $('#posts').isotope(); // Make sure this matches your Isotope initialization in custom.js
-    $container.isotope('reloadItems').isotope({ sortBy: 'original-order' });
-  }
-
+    function refreshIsotope() {
+      const $container = $('#posts').isotope(); // Make sure this matches your Isotope initialization in custom.js
+      $container.isotope('reloadItems').isotope({ sortBy: 'original-order' });
+    }
   // Function to handle image loading for progressive layout adjustment
-  function imageLoaded(scenarioId) {
+  function imageLoaded(scenarioFolderName) {
     refreshIsotope(); // Recalculate the Isotope layout when an image is fully loaded
   }
+  // Function to show detailed scenario section
+  function showScenario(scenarioFolderName) {
+  document.getElementById(`scenario-${scenarioFolderName}`).scrollIntoView({ behavior: 'smooth' });
   }
 });
-
-// Function to show detailed scenario section
-function showScenario(scenarioId) {
-  document.getElementById(scenarioId).scrollIntoView({ behavior: 'smooth' });
-}

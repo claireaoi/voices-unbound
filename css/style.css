@@ -192,7 +192,7 @@ img.img-fluid {
 }
 /*PADDING------------ */
 #portfolio-section {
-  margin-bottom: 100px; /* Add some margin below the portfolio gallery */
+  margin-bottom: 50px; /* Add some margin below the portfolio gallery */
   position: relative;
   z-index: 1; /* Lower z-index for gallery */
 }
