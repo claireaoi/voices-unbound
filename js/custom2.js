@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const scenarioDetailsContainer = document.querySelector('.portfolio-single-inner'); // Container for detailed sections
   const scenarioFolderPath = 'scenarios/'; // Path to the scenarios folder
 
-  // Fetch the list of scenario folders (subfolders)
+  // Fetch the list of scenario folders (subfolders) // @TODO: automatically fetch scenarios or add to this json when new one
   fetch(`${scenarioFolderPath}scenarios.json`)
     .then(response => response.json())
     .then(data => {
