@@ -40,10 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 fetch(jpgPath)
                 .then(response => {
                     if (response.ok) {
-                        // If .jpg exists, use it
+                        console.log(`Try with jpg for ${scenarioFolderName}`);
                         callback(jpgPath);
                     } else {
-                        // If .jpg doesn't exist, try loading the .png version
+                        console.log(`Try with png for ${scenarioFolderName}`);
                         fetch(pngPath)
                             .then(response => {
                                 if (response.ok) {
