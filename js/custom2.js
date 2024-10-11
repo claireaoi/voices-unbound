@@ -32,24 +32,50 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
           })
           .then(data => {
-              console.log(`Loading scenario ${scenarioFolderName}`);
-              // Dynamically create portfolio item HTML
+              console.log(`Looking at scenario ${scenarioFolderName}`);
+              const jpgPath = `${scenarioFolderPath}${scenarioFolderName}/image.jpg`;
+              const pngPath = `${scenarioFolderPath}${scenarioFolderName}/image.png`;
+
+                  // Try loading the .jpg version first
+                fetch(jpgPath)
+                .then(response => {
+                    if (response.ok) {
+                        // If .jpg exists, use it
+                        callback(jpgPath);
+                    } else {
+                        // If .jpg doesn't exist, try loading the .png version
+                        fetch(pngPath)
+                            .then(response => {
+                                if (response.ok) {
+                                    // If .png exists, use it
+                                    callback(pngPath);
+                                } else {
+                                    console.error(`Neither .jpg nor .png found for ${scenarioFolderName}`);
+                                }
+                            });
+                    }
+                })
+                .catch(error => console.error(`Error fetching image for ${scenarioFolderName}:`, error));
+           
+            // Usage in your HTML generation
+            loadImage(scenarioFolderName, function(imagePath) {
               const portfolioItemHTML = `
                   <div class="item web branding col-sm-6 col-md-6 col-lg-4 isotope-mb-2">
-                   <a href="#scenario-${scenarioFolderName}" class="portfolio-item" onclick="showScenario('scenario-${scenarioFolderName}')">
-                      <div class="overlay">
-                        <span class="wrap-icon icon-link2"></span>
-                        <div class="portfolio-item-content">
-                          <h3>${data.title}</h3>
-                          <p>${data.subtitle}</p>
-                        </div>
-                      </div>
-                      <img src="${scenarioFolderPath}${scenarioFolderName}/image.jpg" class="lazyload img-fluid" alt="${data.title}" onload="imageLoaded('${scenarioFolderName}')">
-                    </a>
+                      <a href="#scenario-${scenarioFolderName}" class="portfolio-item" onclick="showScenario('scenario-${scenarioFolderName}')">
+                          <div class="overlay">
+                              <span class="wrap-icon icon-link2"></span>
+                              <div class="portfolio-item-content">
+                                  <h3>${data.title}</h3>
+                                  <p>${data.subtitle}</p>
+                              </div>
+                          </div>
+                          <img src="${imagePath}" class="lazyload img-fluid" alt="${data.title}" onload="imageLoaded('${scenarioFolderName}')">
+                      </a>
                   </div>
               `;
               scenarioContainer.innerHTML += portfolioItemHTML;
-              console.log(`Adding scenario detail for ${scenarioFolderName}`);
+           
+
               // Dynamically create detailed scenario section HTML
               const scenarioDetailHTML = `
                   <div class="row mb-5 scenario-detail" id="scenario-${scenarioFolderName}">
@@ -77,6 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
                   </div>
               `;
               scenarioDetailsContainer.innerHTML += scenarioDetailHTML;
+
+            });
           })
           .catch(error => console.error(`Failed to load scenario ${scenarioFolderName}:`, error));
 
