@@ -14,101 +14,96 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch(error => console.error('Failed to load scenario folders:', error));
 
-  // Loop through all scenario folders
-  //for (let i = 1; i <= scenarioCount; i++) {
-    //   loadScenario(i);
-    //}
-
   // Function to load a scenario's data.json and dynamically create HTML
   function loadScenario(scenarioFolderName) {
     const scenarioPath = `${scenarioFolderPath}${scenarioFolderName}/data.json`;
 
-      // Fetch data.json for each scenario
-      fetch(scenarioPath)
-          .then(response => {
+    // Fetch data.json for each scenario
+    fetch(scenarioPath)
+        .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
-          })
-          .then(data => {
-              console.log(`Looking at scenario ${scenarioFolderName}`);
-              const jpgPath = `${scenarioFolderPath}${scenarioFolderName}/image.jpg`;
-              const pngPath = `${scenarioFolderPath}${scenarioFolderName}/image.png`;
+        })
+        .then(data => {
+            console.log(`Looking at scenario ${scenarioFolderName}`);
+            const jpgPath = `${scenarioFolderPath}${scenarioFolderName}/image.jpg`;
+            const pngPath = `${scenarioFolderPath}${scenarioFolderName}/image.png`;
 
-                  // Try loading the .jpg version first
-                fetch(jpgPath)
+            // Try loading the .jpg version first
+            fetch(jpgPath)
                 .then(response => {
                     if (response.ok) {
-                        console.log(`Try with jpg for ${scenarioFolderName}`);
-                        callback(jpgPath);
+                        console.log(`Using jpg for ${scenarioFolderName}`);
+                        useImagePath(jpgPath, data, scenarioFolderName);
                     } else {
-                        console.log(`Try with png for ${scenarioFolderName}`);
+                        console.log(`Trying with png for ${scenarioFolderName}`);
                         fetch(pngPath)
                             .then(response => {
                                 if (response.ok) {
                                     // If .png exists, use it
-                                    callback(pngPath);
+                                    console.log(`Using png for ${scenarioFolderName}`);
+                                    useImagePath(pngPath, data, scenarioFolderName);
                                 } else {
                                     console.error(`Neither .jpg nor .png found for ${scenarioFolderName}`);
                                 }
-                            });
+                            })
+                            .catch(error => console.error(`Error fetching png for ${scenarioFolderName}:`, error));
                     }
                 })
-                .catch(error => console.error(`Error fetching image for ${scenarioFolderName}:`, error));
-           
-            // Usage in your HTML generation
-            loadImage(scenarioFolderName, function(imagePath) {
-              const portfolioItemHTML = `
-                  <div class="item web branding col-sm-6 col-md-6 col-lg-4 isotope-mb-2">
-                      <a href="#scenario-${scenarioFolderName}" class="portfolio-item" onclick="showScenario('scenario-${scenarioFolderName}')">
-                          <div class="overlay">
-                              <span class="wrap-icon icon-link2"></span>
-                              <div class="portfolio-item-content">
-                                  <h3>${data.title}</h3>
-                                  <p>${data.subtitle}</p>
-                              </div>
-                          </div>
-                          <img src="${imagePath}" class="lazyload img-fluid" alt="${data.title}" onload="imageLoaded('${scenarioFolderName}')">
-                      </a>
-                  </div>
-              `;
-              scenarioContainer.innerHTML += portfolioItemHTML;
-           
+                .catch(error => console.error(`Error fetching jpg for ${scenarioFolderName}:`, error));
+        })
+        .catch(error => console.error(`Failed to load scenario ${scenarioFolderName}:`, error));
+}
 
-              // Dynamically create detailed scenario section HTML
-              const scenarioDetailHTML = `
-                  <div class="row mb-5 scenario-detail" id="scenario-${scenarioFolderName}">
-                    <div class="col-md-4">
-                      <img src="${scenarioFolderPath}${scenarioFolderName}/image.jpg" alt="${data.title}" class="img-fluid">
+// Helper function to dynamically generate the HTML using the correct image path
+function useImagePath(imagePath, data, scenarioFolderName) {
+    // Generate portfolio item HTML
+    const portfolioItemHTML = `
+        <div class="item web branding col-sm-6 col-md-6 col-lg-4 isotope-mb-2">
+            <a href="#scenario-${scenarioFolderName}" class="portfolio-item" onclick="showScenario('scenario-${scenarioFolderName}')">
+                <div class="overlay">
+                    <span class="wrap-icon icon-link2"></span>
+                    <div class="portfolio-item-content">
+                        <h3>${data.title}</h3>
+                        <p>${data.subtitle}</p>
                     </div>
-                    <div class="col-md-8">
-                      <div class="row">
-                        <div class="col-sm-6 col-md-6 col-lg-7">
-                          <div class="detail-v1">
+                </div>
+                <img src="${imagePath}" class="lazyload img-fluid" alt="${data.title}" onload="imageLoaded('${scenarioFolderName}')">
+            </a>
+        </div>
+    `;
+    scenarioContainer.innerHTML += portfolioItemHTML;
+
+    // Dynamically create detailed scenario section HTML
+    const scenarioDetailHTML = `
+        <div class="row mb-5 scenario-detail" id="scenario-${scenarioFolderName}">
+            <div class="col-md-4">
+                <img src="${imagePath}" alt="${data.title}" class="img-fluid">
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-sm-6 col-md-6 col-lg-7">
+                        <div class="detail-v1">
                             <span class="detail-label">Title</span>
                             <span class="detail-val">${data.title}</span>
-                          </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3">
-                          <div class="detail-v1">
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-3">
+                        <div class="detail-v1">
                             <span class="detail-label">Author</span>
                             <span class="detail-val">${data.author}</span>
-                          </div>
                         </div>
-                      </div>
-                      <br><br>
-                      <p>${data.scenario}</p>
                     </div>
-                  </div>
-              `;
-              scenarioDetailsContainer.innerHTML += scenarioDetailHTML;
-
-            });
-          })
-          .catch(error => console.error(`Failed to load scenario ${scenarioFolderName}:`, error));
-
-    }
+                </div>
+                <br><br>
+                <p>${data.scenario}</p>
+            </div>
+        </div>
+    `;
+    scenarioDetailsContainer.innerHTML += scenarioDetailHTML;
+}
 
     // Function to refresh Isotope layout after loading new items
     function refreshIsotope() {
