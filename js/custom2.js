@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
           })
           .catch(error => console.error(`Failed to load scenario ${scenarioFolderName}:`, error));
 
-  }
+    }
 
     // Function to refresh Isotope layout after loading new items
     function refreshIsotope() {
